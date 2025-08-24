@@ -36,7 +36,7 @@ export function HeroSection() {
         <div className="flex justify-center mt-8">
           <div className="relative inline-flex">
             <h1 className="text-7xl sm:text-9xl font-bold tracking-tighter text-center inline-flex">
-              Kelola <br /> Sampahmu
+              Kelola <br /> Sampahmuuu
             </h1>
             <motion.div
               className="absolute right-[476px] top-[108px] hidden sm:inline cursor-grabbing"
