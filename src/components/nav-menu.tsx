@@ -2,9 +2,12 @@
 
 import { siteConfig } from "@/lib/config";
 import { motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React, { useRef, useState, useEffect } from "react";
 
 interface NavItem {
+  id: number;
   name: string;
   href: string;
 }
@@ -13,102 +16,55 @@ const navs: NavItem[] = siteConfig.nav.links;
 
 export function NavMenu() {
   const ref = useRef<HTMLUListElement>(null);
+  const pathname = usePathname();
   const [left, setLeft] = useState(0);
   const [width, setWidth] = useState(0);
   const [isReady, setIsReady] = useState(false);
-  const [activeSection, setActiveSection] = useState("hero");
-  const [isManualScroll, setIsManualScroll] = useState(false);
 
-  React.useEffect(() => {
-    // Initialize with first nav item
-    const firstItem = ref.current?.querySelector(
-      `[href="#${navs[0].href.substring(1)}"]`,
-    )?.parentElement;
-    if (firstItem) {
-      const rect = firstItem.getBoundingClientRect();
-      setLeft(firstItem.offsetLeft);
-      setWidth(rect.width);
-      setIsReady(true);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      // Skip scroll handling during manual click scrolling
-      if (isManualScroll) return;
-
-      const sections = navs.map((item) => item.href.substring(1));
-
-      // Find the section closest to viewport top
-      let closestSection = sections[0];
-      let minDistance = Infinity;
-
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const distance = Math.abs(rect.top - 100); // Offset by 100px to trigger earlier
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestSection = section;
-          }
-        }
-      }
-
-      // Update active section and nav indicator
-      setActiveSection(closestSection);
-      const navItem = ref.current?.querySelector(
-        `[href="#${closestSection}"]`,
+  // Update indicator position when pathname changes
+  useEffect(() => {
+    const updateIndicator = () => {
+      const activeNavItem = ref.current?.querySelector(
+        `[data-href="${pathname}"]`
       )?.parentElement;
-      if (navItem) {
-        const rect = navItem.getBoundingClientRect();
-        setLeft(navItem.offsetLeft);
+      
+      if (activeNavItem) {
+        const rect = activeNavItem.getBoundingClientRect();
+        setLeft(activeNavItem.offsetLeft);
         setWidth(rect.width);
+        setIsReady(true);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isManualScroll]);
+    // Use setTimeout to ensure DOM is ready
+    const timer = setTimeout(updateIndicator, 0);
+    
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
-  const handleClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    item: NavItem,
-  ) => {
-    e.preventDefault();
-
-    const targetId = item.href.substring(1);
-    const element = document.getElementById(targetId);
-
-    if (element) {
-      // Set manual scroll flag
-      setIsManualScroll(true);
-
-      // Immediately update nav state
-      setActiveSection(targetId);
-      const navItem = e.currentTarget.parentElement;
-      if (navItem) {
-        const rect = navItem.getBoundingClientRect();
-        setLeft(navItem.offsetLeft);
+  // Initialize indicator position on mount
+  useEffect(() => {
+    const initializeIndicator = () => {
+      const activeNavItem = ref.current?.querySelector(
+        `[data-href="${pathname}"]`
+      )?.parentElement;
+      
+      if (activeNavItem) {
+        const rect = activeNavItem.getBoundingClientRect();
+        setLeft(activeNavItem.offsetLeft);
         setWidth(rect.width);
+        setIsReady(true);
       }
+    };
 
-      // Calculate exact scroll position
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset
+    // Delay initialization to ensure proper measurement
+    const timer = setTimeout(initializeIndicator, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
-      // Smooth scroll to exact position
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      // Reset manual scroll flag after animation completes
-      setTimeout(() => {
-        setIsManualScroll(false);
-      }, 500); // Adjust timing to match scroll animation duration
-    }
+  const isLinkActive = (href: string) => {
+    return pathname === href;
   };
 
   return (
@@ -117,25 +73,33 @@ export function NavMenu() {
         className="relative mx-auto flex w-fit rounded-full h-11 px-2 items-center justify-center"
         ref={ref}
       >
-        {navs.map((item) => (
-          <li
-            key={item.name}
-            className={`z-10 cursor-pointer h-full flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-              activeSection === item.href.substring(1)
-                ? "text-primary"
-                : "text-primary/60 hover:text-primary"
-            } tracking-tight`}
-          >
-            <a href={item.href} onClick={(e) => handleClick(e, item)}>
-              {item.name}
-            </a>
-          </li>
-        ))}
+        {navs.map((item) => {
+          const isActive = isLinkActive(item.href);
+          
+          return (
+            <li
+              key={item.id}
+              className={`z-10 cursor-pointer h-full flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                isActive
+                  ? "text-primary"
+                  : "text-primary/60 hover:text-primary"
+              } tracking-tight`}
+            >
+              <Link 
+                href={item.href} 
+                data-href={item.href}
+                className="w-full h-full flex items-center justify-center"
+              >
+                {item.name}
+              </Link>
+            </li>
+          );
+        })}
         {isReady && (
           <motion.li
             animate={{ left, width }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-className="absolute inset-0 my-1.5 rounded-full bg-accent/60 border border-[#34D399]"
+            className="absolute inset-0 my-1.5 rounded-full bg-accent/60 border border-[#34D399]"
           />
         )}
       </ul>

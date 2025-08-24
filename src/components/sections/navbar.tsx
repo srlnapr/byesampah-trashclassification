@@ -3,15 +3,14 @@
 import Logo from "@/assets/images/logo.png";
 import Image from "next/image";
 
-
 import { NavMenu } from "@/components/nav-menu";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const INITIAL_WIDTH = "70rem";
 const MAX_WIDTH = "800px";
@@ -55,33 +54,9 @@ const drawerMenuVariants = {
 
 export function Navbar() {
   const { scrollY } = useScroll();
+  const pathname = usePathname();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("hero");
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = siteConfig.nav.links.map((item) =>
-        item.href.substring(1)
-      );
-
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom >= 150) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     const unsubscribe = scrollY.on("change", (latest) => {
@@ -92,6 +67,17 @@ export function Navbar() {
 
   const toggleDrawer = () => setIsDrawerOpen((prev) => !prev);
   const handleOverlayClick = () => setIsDrawerOpen(false);
+
+  // Simplified function to check if a link is active
+  const isLinkActive = (href: string) => {
+    if (href.startsWith('#')) {
+      // For hash links - if you have any in the future
+      return false; // You can implement hash logic here if needed
+    } else {
+      // For regular routes, check pathname
+      return pathname === href;
+    }
+  };
 
   return (
     <header
@@ -168,15 +154,15 @@ export function Navbar() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <Link href="/" className="flex items-center gap-3">
-<Image
-  src={Logo}
-  alt="Logo"
-  width={40}
-  height={40}
-  className="size-10 md:size-12"
-/>
+                    <Image
+                      src={Logo}
+                      alt="Logo"
+                      width={40}
+                      height={40}
+                      className="size-10 md:size-12"
+                    />
                     <p className="text-lg font-semibold text-primary">
-                      Byesampah
+                      ByeSampah!
                     </p>
                   </Link>
                   <button
@@ -192,32 +178,29 @@ export function Navbar() {
                   variants={drawerMenuContainerVariants}
                 >
                   <AnimatePresence>
-                    {siteConfig.nav.links.map((item) => (
-                      <motion.li
-                        key={item.id}
-                        className="p-2.5 border-b border-border last:border-b-0"
-                        variants={drawerMenuVariants}
-                      >
-                        <a
-                          href={item.href}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            const element = document.getElementById(
-                              item.href.substring(1)
-                            );
-                            element?.scrollIntoView({ behavior: "smooth" });
-                            setIsDrawerOpen(false);
-                          }}
-                          className={`underline-offset-4 hover:text-primary/80 transition-colors ${
-                            activeSection === item.href.substring(1)
-                              ? "text-primary font-medium"
-                              : "text-primary/60"
-                          }`}
+                    {siteConfig.nav.links.map((item) => {
+                      const isActive = isLinkActive(item.href);
+                      
+                      return (
+                        <motion.li
+                          key={item.id}
+                          className="p-2.5 border-b border-border last:border-b-0"
+                          variants={drawerMenuVariants}
                         >
-                          {item.name}
-                        </a>
-                      </motion.li>
-                    ))}
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsDrawerOpen(false)}
+                            className={`underline-offset-4 hover:text-primary/80 transition-colors ${
+                              isActive
+                                ? "text-primary font-medium"
+                                : "text-primary/60"
+                            }`}
+                          >
+                            {item.name}
+                          </Link>
+                        </motion.li>
+                      );
+                    })}
                   </AnimatePresence>
                 </motion.ul>
 
