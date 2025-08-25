@@ -33,17 +33,11 @@ export function AboutSection() {
   };
 
   const itemVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 20 
-    },
+    hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
+      transition: { duration: 0.6, ease: "easeOut" }
     }
   };
 
@@ -53,6 +47,26 @@ export function AboutSection() {
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-32 h-32 bg-emerald-100 rounded-full blur-xl opacity-50"></div>
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-green-100 rounded-full blur-xl opacity-40"></div>
+
+        {/* Gradient dari section di atas (hero) */}
+        
+        
+        {/* Gradient atas untuk continuity effect */}
+        <div
+          className="absolute h-[200px] w-full left-0 right-0
+          bg-gradient-to-b from-[#34D399] via-[#6EE7B7] to-transparent
+          opacity-40
+          top-0"
+        ></div>
+        
+        {/* Horizon gradient tambahan untuk smooth blending */}
+        <div
+          className="absolute h-[120px] w-[900px] sm:w-[1600px] sm:h-[150px] 
+          lg:w-[2200px] lg:h-[180px] rounded-[100%] left-1/2 -translate-x-1/2
+          bg-[radial-gradient(circle_at_top,rgba(52,211,153,0.4)_0%,rgba(110,231,183,0.25)_40%,rgba(209,250,229,0.1)_70%,transparent_100%)]
+          blur-lg opacity-70
+          top-0"
+        ></div>
       </div>
       
       <div className="container relative mx-auto px-4">
@@ -125,21 +139,7 @@ export function AboutSection() {
           })}
         </motion.div>
         
-        {/* Call to action */}
-        <motion.div 
-          className="text-center mt-16"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={itemVariants}
-        >
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-green-50 px-6 py-3 rounded-full border border-emerald-200">
-            <span className="text-emerald-700 font-medium">
-              Mari bersama wujudkan lingkungan yang lebih bersih! 
-            </span>
-            <span className="text-2xl">🌍</span>
-          </div>
-        </motion.div>
+       
       </div>
     </section>
   );
