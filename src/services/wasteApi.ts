@@ -1,12 +1,11 @@
-import { WasteResult } from "@/types/waste";
+import { WasteResult, WasteApiResponse, WasteApiPrediction } from "@/types/waste";
 
-function mapToWasteResult(payload: any): WasteResult {
-  // Ambil data utama dari "prediction" kalau ada
-  const p = payload?.prediction ?? payload;
+function mapToWasteResult(payload: WasteApiResponse): WasteResult {
+  const p: WasteApiPrediction = payload?.prediction ?? (payload as WasteApiPrediction);
 
   const type =
     p?.predicted_label ??
-    p?.predicted_class ?? // ✅ sesuai response dari API
+    p?.predicted_class ??
     p?.label ??
     "Unknown";
 
@@ -17,7 +16,7 @@ function mapToWasteResult(payload: any): WasteResult {
     confidence: Number(p?.confidence ?? p?.score ?? 0),
     description: p?.description ?? `Sampah terdeteksi sebagai ${type}.`,
     category,
-    color: "from-emerald-500 to-green-500", // bisa diganti dinamis kalau mau beda warna per kategori
+    color: "from-emerald-500 to-green-500",
     icon: "♻️",
     recommendations:
       p?.recommendations ?? [
@@ -25,7 +24,7 @@ function mapToWasteResult(payload: any): WasteResult {
         "Bersihkan sebelum didaur ulang.",
         "Gunakan kembali bila memungkinkan.",
       ],
-    economicValue: p?.economic_value ?? null,
+    economicValue: p?.economic_value != null ? String(p.economic_value) : undefined,
   };
 }
 
@@ -35,10 +34,10 @@ export const classifyWaste = async (imageFile: File): Promise<WasteResult> => {
   }
 
   const formData = new FormData();
-  formData.append("file", imageFile); // ✅ API hanya butuh 'file'
+  formData.append("file", imageFile);
 
   const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), 25000); // 25s timeout
+  const t = setTimeout(() => controller.abort(), 25000);
 
   try {
     const res = await fetch(
@@ -47,7 +46,6 @@ export const classifyWaste = async (imageFile: File): Promise<WasteResult> => {
         method: "POST",
         headers: {
           accept: "application/json",
-          // ❌ jangan set Content-Type manual, biar FormData otomatis
         },
         body: formData,
         signal: controller.signal,
@@ -55,7 +53,7 @@ export const classifyWaste = async (imageFile: File): Promise<WasteResult> => {
     );
     clearTimeout(t);
 
-    const data = await res.json();
+    const data: WasteApiResponse = await res.json();
 
     if (!res.ok) {
       const msg =
@@ -64,11 +62,14 @@ export const classifyWaste = async (imageFile: File): Promise<WasteResult> => {
     }
 
     return mapToWasteResult(data);
-  } catch (err: any) {
-    if (err?.name === "AbortError") {
-      throw new Error("Koneksi ke server timeout. Coba lagi.");
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      if (err.name === "AbortError") {
+        throw new Error("Koneksi ke server timeout. Coba lagi.");
+      }
+      throw new Error(err.message || "Terjadi kesalahan tak terduga.");
     }
-    throw new Error(err?.message || "Terjadi kesalahan tak terduga.");
+    throw new Error("Terjadi kesalahan tak terduga.");
   } finally {
     clearTimeout(t);
   }

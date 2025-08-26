@@ -1,4 +1,3 @@
-// types/waste.ts
 export interface WasteResult {
   type: string;
   category: string;
@@ -18,4 +17,23 @@ export interface WasteArticle {
 
 export interface WasteArticles {
   [key: string]: WasteArticle;
+}
+
+// ✅ Tipe response API (biar ga pakai any lagi)
+export interface WasteApiPrediction {
+  predicted_label?: string;
+  predicted_class?: string;
+  label?: string;
+  category?: string;
+  confidence?: number;
+  score?: number;
+  description?: string;
+  recommendations?: string[];
+  economic_value?: number | string | null;
+}
+
+export interface WasteApiResponse {
+  prediction?: WasteApiPrediction;
+  message?: string;
+  detail?: string;
 }
