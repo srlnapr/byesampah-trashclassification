@@ -172,7 +172,7 @@ export function Footer() {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-gray-600 text-sm">
-              <span>© {currentYear} Byesampah. Dibuat dengan</span>
+              <span>© {currentYear} Byesampah</span>
               <motion.div
                 animate={{ 
                   scale: [1, 1.2, 1],
@@ -183,7 +183,6 @@ export function Footer() {
                   repeatType: "loop"
                 }}
               >
-                <Heart className="w-4 h-4 text-red-400 fill-red-400" />
               </motion.div>
               <span>untuk lingkungan yang lebih baik.</span>
             </div>

@@ -27,7 +27,9 @@ const TipsSection: React.FC = () => {
   ];
 
   return (
-    <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8">
+<div className="mt-12 rounded-3xl p-8 
+    bg-gradient-to-r from-green-50 via-green-100 to-green-50 
+    border border-green-200 shadow-md">
       <h3 className="text-2xl font-bold text-gray-900 mb-6">💡 Tips untuk Hasil Terbaik</h3>
       <div className="grid md:grid-cols-2 gap-6">
         {tips.map((tip, index) => (
