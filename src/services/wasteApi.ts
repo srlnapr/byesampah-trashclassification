@@ -1,4 +1,4 @@
-import { WasteResult } from "../types/waste";
+import { WasteResult } from "@/types/waste";
 
 function mapToWasteResult(payload: any): WasteResult {
   // Ambil data utama dari "prediction" kalau ada

@@ -1,7 +1,7 @@
 // components/WasteResult.tsx
 import React from 'react';
 import { CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
-import { WasteResult as WasteResultType, WasteArticles } from '../types/waste';
+import { WasteResult as WasteResultType, WasteArticles } from '@/types/waste';
 
 interface WasteResultProps {
   result: WasteResultType;
