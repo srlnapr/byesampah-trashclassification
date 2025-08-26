@@ -1,6 +1,6 @@
 // components/suggestions/QuickTipCard.tsx
 import React from 'react';
-import { QuickTip } from '../../types/suggestions';
+import { QuickTip } from '@/types/suggestions';
 
 interface QuickTipCardProps {
   tip: QuickTip;

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, Variants, easeOut } from "framer-motion";
 import { Heart, Mail, Github, Instagram, Twitter } from "lucide-react";
 
 export function Footer() {
@@ -39,7 +39,7 @@ export function Footer() {
     { name: "Ulasan", href: "#ulasan" }
   ];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -50,14 +50,14 @@ export function Footer() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut"
+        ease: easeOut
       }
     }
   };
@@ -182,8 +182,7 @@ export function Footer() {
                   repeat: Infinity,
                   repeatType: "loop"
                 }}
-              >
-              </motion.div>
+              />
               <span>untuk lingkungan yang lebih baik.</span>
             </div>
             

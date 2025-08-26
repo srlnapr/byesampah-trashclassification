@@ -29,7 +29,7 @@ const drawerVariants = {
     y: 0,
     rotate: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 15,
       stiffness: 200,
       staggerChildren: 0.03,
@@ -168,6 +168,7 @@ export function Navbar() {
                   <button
                     onClick={toggleDrawer}
                     className="border border-border rounded-md p-1 cursor-pointer"
+                    title="Close menu"
                   >
                     <X className="size-5" />
                   </button>
